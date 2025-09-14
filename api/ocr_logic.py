@@ -7,43 +7,72 @@ from .models import Vehiculo
 # Le indicamos a pytesseract dónde encontrar el ejecutable de Tesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
+# Ancho y alto mínimo del contorno para ser considerado una placa
+MIN_PLATE_WIDTH = 60
+MIN_PLATE_HEIGHT = 15
+
+
+def validar_formato_placa(texto):
+    """
+    Limpia y valida si el texto extraído podría ser una placa.
+    Busca patrones comunes como 3-4 números seguidos de 3 letras.
+    """
+    # Limpiamos el texto de caracteres no alfanuméricos y lo ponemos en mayúsculas
+    texto_limpio = re.sub(r'[^A-Z0-9]', '', texto.upper())
+
+    # Un patrón simple: busca al menos 3 letras y 3 números.
+    # Puedes hacerlo más estricto si conoces el formato exacto.
+    # Ejemplo: re.compile(r'^\d{3,4}[A-Z]{3}$')
+    if len(texto_limpio) >= 6 and len(re.findall(r'[A-Z]', texto_limpio)) >= 3 and len(re.findall(r'\d', texto_limpio)) >= 3:
+        return texto_limpio
+    return None
+
 
 def reconocer_placa(image):
     """
-    Detecta una placa en la imagen, la recorta y extrae el texto con Tesseract.
+    Procesa una imagen para detectar, leer y validar una placa de vehículo.
     """
-    # Convertir a escala de grises para mejorar la precisión de OCR
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # 1. Pre-procesamiento de la imagen
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Filtro Gaussiano para reducir el ruido
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    # Binarización adaptativa para manejar condiciones de iluminación variables
+    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                   cv2.THRESH_BINARY_INV, 11, 2)
+    
+    # Operaciones morfológicas para eliminar ruido y unir caracteres
+    # Esto ayuda a que el contorno de la placa sea más sólido.
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    closing = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
 
-    # Cargar el clasificador Haar para detectar placas
-    # __file__ es la ruta de este archivo (ocr_logic.py)
-    cascade_path = os.path.join(os.path.dirname(
-        __file__), 'haarcascade_russian_plate_number.xml')
-    plate_cascade = cv2.CascadeClassifier(cascade_path)
+    # 2. Detección de contornos
+    contornos, _ = cv2.findContours(
+        closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Detectar placas en la imagen
-    plates = plate_cascade.detectMultiScale(
-        gray_image, scaleFactor=1.1, minNeighbors=5)
+    # Variable para guardar las coordenadas del rectángulo de la placa detectada
+    rect_placa = None
+    placa_limpia = ""
+    # Iterar sobre los contornos encontrados
+    for c in contornos:
+        # 3. Filtrado de contornos por tamaño y forma
+        (x, y, w, h) = cv2.boundingRect(c)
+        aspect_ratio = w / float(h)
+        if w > MIN_PLATE_WIDTH and h > MIN_PLATE_HEIGHT and 2.5 < aspect_ratio < 5.0:
+            # 4. Recorte de la posible placa (ROI - Region of Interest)
+            roi = gray[y:y+h, x:x+w]
 
-    texto_extraido = ""
-    # Iterar sobre las placas detectadas (normalmente será una)
-    for (x, y, w, h) in plates:
-        # Recortar la imagen para obtener solo la placa
-        plate_image = gray_image[y:y+h, x:x+w]
+            # 5. OCR con Tesseract y configuración optimizada
+            config = "-c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 --psm 7"
+            texto_extraido = pytesseract.image_to_string(roi, config=config)
 
-        # Usar Tesseract para extraer texto de la placa recortada
-        # El config '--psm 8' asume que la imagen es una sola palabra.
-        texto_extraido = pytesseract.image_to_string(
-            plate_image, config='--psm 8')
-
-        # Si encontramos texto, salimos del bucle
-        if texto_extraido:
-            break
-
-    # Limpiar el texto: eliminar caracteres no alfanuméricos y convertir a mayúsculas
-    placa_limpia = re.sub(r'[^A-Z0-9]', '', texto_extraido).upper()
+            # 6. Validación del formato de la placa
+            placa_validada = validar_formato_placa(texto_extraido)
+            if placa_validada:
+                placa_limpia = placa_validada
+                rect_placa = (x, y, w, h) # Guardamos las coordenadas
+                break  # Encontramos una placa válida, salimos del bucle
 
     # Buscar el vehículo en la base de datos
     vehiculo = Vehiculo.objects.filter(placa=placa_limpia).first()
 
-    return vehiculo, placa_limpia
+    return vehiculo, placa_limpia, rect_placa
