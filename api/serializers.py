@@ -1,11 +1,15 @@
 from rest_framework import serializers
-from .models import UnidadHabitacional, Residente, Visitante, RegistroAcceso, Vehiculo
+from .models import (
+    UnidadHabitacional, Residente, Visitante, RegistroAcceso, Vehiculo,
+    AreaComun, ReservaAreaComun, Gasto, Aviso
+)
 
 
 class UnidadHabitacionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = UnidadHabitacional
         fields = '__all__'
+        read_only_fields = ['saldo_deudor']
 
 
 class VehiculoSerializer(serializers.ModelSerializer):
@@ -60,3 +64,26 @@ class RegistroAccesoSerializer(serializers.ModelSerializer):
         model = RegistroAcceso
         fields = '__all__'
         read_only_fields = ['persona_nombre']
+
+
+class AreaComunSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AreaComun
+        fields = '__all__'
+
+
+class ReservaAreaComunSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReservaAreaComun
+        fields = '__all__'
+
+
+class GastoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gasto
+        fields = '__all__'
+
+class AvisoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Aviso
+        fields = '__all__'

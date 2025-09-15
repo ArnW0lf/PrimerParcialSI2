@@ -1,0 +1,226 @@
+python -m venv venv
+.\venv\Scripts\activate
+pip install django djangorestframework psycopg2-binary opencv-python face_recognition
+django-admin startproject smart_condominium
+cd smart_condominium
+python manage.py startapp gestion
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+
+Frontend (React):
+bash
+npx create-react-app frontend
+cd frontend
+npm install axios react-router-dom
+npm start
+
+Móvil (Flutter):
+bash
+flutter create mobile_app
+cd mobile_app
+flutter pub add http provider shared_preferences
+flutter run
+
+¡Claro! Implementaremos el proyecto "Smart Condominium" por fases, comenzando con los aspectos básicos y expandiéndonos gradualmente. Aquí está el plan inicial, con énfasis en la funcionalidad de la IA y la base de datos:
+
+Fase 1: Estructura Base y Funcionalidades Esenciales
+
+Configuración del Proyecto Base:
+
+Backend (Django):
+Crear la estructura inicial del proyecto Django.
+Configurar la base de datos PostgreSQL.
+Definir modelos básicos para:
+Usuarios (residentes, administración, seguridad).
+Unidades habitacionales (apartamentos/casas).
+Roles de usuario.
+Visitantes.
+Vehículos.
+Frontend (React):
+Crear la estructura inicial del proyecto React.
+Establecer la conexión básica con el backend de Django.
+Diseñar interfaces de usuario simples para:
+Inicio de sesión.
+Registro de usuarios.
+Visualización de información básica del usuario.
+Móvil (Flutter):
+Crear la estructura inicial del proyecto Flutter.
+Implementar la autenticación básica.
+Desarrollar interfaces para:
+Consulta de cuotas.
+Visualización de avisos.
+Base de Datos (PostgreSQL):
+
+Diseñar un esquema de base de datos completo que soporte todas las funcionalidades del proyecto. Esto incluye tablas para:
+Usuarios: Información de los usuarios (residentes, administración, seguridad, etc.).
+UnidadesHabitacionales: Detalles de cada unidad (número, propietario, etc.).
+Roles: Roles de usuario y permisos.
+Visitantes: Información de los visitantes y registros de acceso.
+Vehiculos: Placas, propietarios y permisos de acceso.
+AreasComunes: Información y reservas.
+Cuotas: Detalles de las cuotas de mantenimiento.
+Pagos: Registros de pagos.
+Avisos: Comunicados de la administración.
+Incidentes: Incidentes de seguridad detectados por IA.
+Mantenimiento: Tareas de mantenimiento y reportes.
+Establecer relaciones entre las tablas para asegurar la integridad de los datos.
+Crear usuarios y roles con los permisos adecuados.
+IA y Visión Artificial (Módulo Básico):
+
+Reconocimiento Facial:
+Implementar un sistema básico de reconocimiento facial utilizando una librería como OpenCV o Face Recognition.
+Almacenar características faciales de los residentes autorizados en la base de datos.
+Configurar una cámara de prueba para capturar imágenes y probar el reconocimiento facial.
+Generar alertas básicas cuando se detecte una persona no autorizada (simulación).
+Control de Visitantes:
+Implementar una interfaz para registrar visitantes con foto.
+Almacenar la información y la foto del visitante en la base de datos.
+Detección de Anomalías:
+Implementar la funcionalidad de detección de "Perros sueltos dentro del condominio", usando OpenCV y modelos de Machine Learning pre-entrenados para detección de objetos.
+Alertas básicas cuando se detecte la anomalia (simulación).
+Resumen de la Fase 1
+
+En esta fase, se establece la estructura base del proyecto y se implementan las funcionalidades esenciales con un enfoque inicial en la IA y la base de datos. Esto proporciona una base sólida para expandir el proyecto en las siguientes fases.
+
+Comandos Utilizados (Ejemplo):
+
+Backend (Django):
+bash
+python -m venv venv
+source venv/bin/activate
+pip install django djangorestframework psycopg2-binary opencv-python face_recognition
+//////se tuvo un porblema, se soluciono isnstalando las dependencias de visual studio
+//////lo referente con c++
+django-admin startproject smart_condominium
+cd smart_condominium
+python manage.py startapp gestion
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+Frontend (React):
+bash
+npx create-react-app frontend
+cd frontend
+npm install axios react-router-dom
+npm start
+Móvil (Flutter):
+bash
+flutter create mobile_app
+cd mobile_app
+flutter pub add http provider shared_preferences
+flutter run
+Fase 2: Expansión de Funcionalidades y Refinamiento de la IA
+
+Backend (Django):
+
+Implementar APIs REST para todas las funcionalidades básicas.
+Añadir autenticación y autorización basadas en roles.
+Implementar la lógica para la gestión de cuotas, pagos y avisos.
+Integrar el módulo de IA con las APIs para recibir y procesar datos.
+Desarrollar una API para servir datos para la analítica predictiva (morosidad).
+Frontend (React):
+
+Desarrollar interfaces para la gestión administrativa (usuarios, roles, unidades).
+Implementar la visualización de reportes financieros y estadísticas de seguridad.
+Integrar la gestión de áreas comunes y mantenimiento.
+Móvil (Flutter):
+
+Implementar la funcionalidad completa de consulta y pago de cuotas.
+Añadir la funcionalidad de reservas de áreas comunes.
+Integrar notificaciones push en tiempo real para incidentes detectados por la IA.
+IA y Visión Artificial (Refinamiento):
+
+Reconocimiento Facial:
+Mejorar la precisión del reconocimiento facial mediante el ajuste de parámetros y el uso de técnicas de Machine Learning.
+Implementar el acceso automático a residentes mediante reconocimiento facial en una puerta de prueba.
+Control de Visitantes:
+Integrar OCR para la lectura de documentos de identidad de los visitantes.
+Reconocimiento de Vehículos:
+Implementar la lectura automática de placas vehiculares (OCR) utilizando una librería como Tesseract OCR.
+Integrar el control de acceso para vehículos autorizados.
+Detección de Anomalías:
+Entrenar modelos de Machine Learning personalizados para detectar comportamientos sospechosos específicos del condominio.
+Analítica Predictiva:
+Implementar modelos de analítica predictiva para la morosidad financiera, utilizando datos históricos de pagos y técnicas de Machine Learning.
+Resumen de la Fase 2
+
+En esta fase, se expanden las funcionalidades del proyecto y se refina la IA, mejorando la precisión y añadiendo nuevas capacidades.
+
+Comandos Utilizados (Ejemplo):
+
+Backend (Django):
+bash
+pip install djangorestframework-simplejwt
+python manage.py makemigrations
+python manage.py migrate
+Frontend (React):
+bash
+npm install recharts
+Móvil (Flutter):
+bash
+flutter pub add firebase_core firebase_messaging flutter_local_notifications
+Este es un plan inicial para el desarrollo de "Smart Condominium". Cada fase se puede dividir en tareas más pequeñas y detalladas.
+
+
+Instalaremos Django, Django REST Framework (para crear APIs), psycopg2-binary (para la conexión con PostgreSQL), OpenCV y face_recognition (para la funcionalidad de reconocimiento facial).
+pip install django djangorestframework psycopg2-binary opencv-python face_recognition
+(para este paso se requiere cmake y entorno c++)
+
+.\venv\Scripts\activate
+
+python -m django startproject smartcondo
+
+python manage.py startapp api
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+python manage.py runserver
+
+//reconocimiento de placa usando pytesseract junto con Tesseract-OCR de google
+pip install pytesseract
+
+descargar e instalar:  https://github.com/UB-Mannheim/tesseract/wiki
+marcar add Tesseract al path del sistema
+
+# Le indicamos a pytesseract dónde encontrar el ejecutable de Tesseract lo cual ya esta implementad en ocr-log
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+crear token para probar la seguridad en postman
+python manage.py drf_create_token <nombre_de_tu_superusuario>
+
+Probar la API Protegida
+Inicia tu servidor: python manage.py runserver.
+Abre Postman e intenta hacer una petición GET a http://127.0.0.1:8000/api/residentes/.
+Recibirás una respuesta 401 Unauthorized con el mensaje: "detail": "Authentication credentials were not provided.". ¡Perfecto! La protección está funcionando.
+Ahora, ve a la pestaña Headers en Postman.
+Añade una nueva cabecera:
+KEY: Authorization
+VALUE: Token <tu_token_aqui> (reemplaza <tu_token_aqui> con el token que generaste).
+
+Crea una nueva petición:
+
+Método: POST
+URL: http://127.0.0.1:8000/api/reconocer-vehiculo/
+Configura el cuerpo (Body) de la petición:
+
+Selecciona la pestaña Body.
+Elige la opción form-data.
+En la tabla de KEY / VALUE:
+En la columna KEY, escribe image.
+Justo a la derecha de donde escribiste image, verás un desplegable que por defecto dice "Text". Haz clic ahí y cámbialo a "File".
+
+Inicia tu servidor (python manage.py runserver).
+Usando una herramienta como Postman o Insomnia, haz una petición POST a http://127.0.0.1:8000/api/gastos/generar-expensas/.
+En el cuerpo (body) de la petición, envía un JSON como este:
+json
+{
+    "monto": 250.00,
+    "descripcion": "Expensas del mes de Agosto 2024",
+    "dias_vencimiento": 10
+}
+Deberías recibir una respuesta 201 Created con la lista de todos los gastos que se acaban de crear.

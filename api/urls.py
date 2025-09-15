@@ -14,6 +14,10 @@ router.register(r'residentes', views.ResidenteViewSet)
 router.register(r'visitantes', views.VisitanteViewSet)
 router.register(r'registros-acceso', views.RegistroAccesoViewSet)
 router.register(r'vehiculos', views.VehiculoViewSet)
+router.register(r'areas-comunes', views.AreaComunViewSet)
+router.register(r'reservas', views.ReservaAreaComunViewSet)
+router.register(r'gastos', views.GastoViewSet)
+router.register(r'avisos', views.AvisoViewSet)
 
 urlpatterns = [
     path('', include(router.urls)), # URLs del CRUD

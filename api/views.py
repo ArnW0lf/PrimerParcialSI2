@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
@@ -11,14 +12,22 @@ from .models import (
     Residente,
     Visitante,
     RegistroAcceso,
-    Vehiculo
+    Vehiculo,
+    AreaComun,
+    ReservaAreaComun,
+    Gasto,
+    Aviso
 )
 from .serializers import (
     UnidadHabitacionalSerializer,
     ResidenteSerializer,
     VisitanteSerializer,
     RegistroAccesoSerializer,
-    VehiculoSerializer
+    VehiculoSerializer,
+    AreaComunSerializer,
+    ReservaAreaComunSerializer,
+    GastoSerializer,
+    AvisoSerializer
 )
 
 
@@ -49,6 +58,68 @@ class VehiculoViewSet(viewsets.ModelViewSet):
 class RegistroAccesoViewSet(viewsets.ModelViewSet):
     queryset = RegistroAcceso.objects.all()
     serializer_class = RegistroAccesoSerializer
+    permission_classes = [IsAuthenticated] # <-- Añadir esta línea
+
+
+class AreaComunViewSet(viewsets.ModelViewSet):
+    queryset = AreaComun.objects.all()
+    serializer_class = AreaComunSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class ReservaAreaComunViewSet(viewsets.ModelViewSet):
+    queryset = ReservaAreaComun.objects.all()
+    serializer_class = ReservaAreaComunSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class GastoViewSet(viewsets.ModelViewSet):
+    queryset = Gasto.objects.all()
+    serializer_class = GastoSerializer
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['post'], url_path='generar-expensas')
+    def generar_expensas(self, request):
+        """
+        Genera los gastos de expensas mensuales para todas las unidades habitacionales.
+        Espera un JSON con 'monto', 'descripcion' y 'dias_vencimiento'.
+        Ej: {"monto": 100.50, "descripcion": "Expensas Mes de Julio", "dias_vencimiento": 15}
+        """
+        from datetime import date, timedelta
+
+        monto = request.data.get('monto')
+        descripcion = request.data.get('descripcion')
+        dias_vencimiento = request.data.get('dias_vencimiento')
+
+        if not all([monto, descripcion, dias_vencimiento]):
+            return Response(
+                {"error": "Faltan los parámetros 'monto', 'descripcion' o 'dias_vencimiento'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        unidades = UnidadHabitacional.objects.all()
+        fecha_emision = date.today()
+        fecha_vencimiento = fecha_emision + timedelta(days=int(dias_vencimiento))
+        
+        gastos_creados = []
+        for unidad in unidades:
+            gasto = Gasto.objects.create(
+                unidad=unidad,
+                monto=monto,
+                descripcion=descripcion,
+                fecha_vencimiento=fecha_vencimiento
+            )
+            gastos_creados.append(self.get_serializer(gasto).data)
+
+        return Response(
+            {"mensaje": f"Se generaron {len(gastos_creados)} gastos de expensas.", "gastos": gastos_creados},
+            status=status.HTTP_201_CREATED
+        )
+
+
+class AvisoViewSet(viewsets.ModelViewSet):
+    queryset = Aviso.objects.all()
+    serializer_class = AvisoSerializer
     permission_classes = [IsAuthenticated] # <-- Añadir esta línea
 
 
